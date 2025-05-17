@@ -1,0 +1,41 @@
+{
+  "repositories": [
+    {
+      "id": "repo1747364060274",
+      "name": "New Repository",
+      "url": "vjneven"
+    },
+    {
+      "id": "repo1747364066928",
+      "name": "New Repository",
+      "url": ""
+    }
+  ],
+  "hosts": [
+    {
+      "id": "host1747364071346",
+      "name": "New Host",
+      "scripts": [
+        "script1747364077721",
+        "script1747364082042"
+      ]
+    },
+    {
+      "id": "host1747364074444",
+      "name": "New Host",
+      "scripts": []
+    }
+  ],
+  "scripts": [
+    {
+      "id": "script1747364077721",
+      "name": "New Script",
+      "path": "./deploy-scripts/new-script.sh"
+    },
+    {
+      "id": "script1747364082042",
+      "name": "New Script",
+      "path": "./deploy-scripts/new-script.sh"
+    }
+  ]
+}

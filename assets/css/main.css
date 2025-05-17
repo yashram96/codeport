@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: 59 130 246;
+    --color-secondary: 100 116 139;
+    --color-accent: 249 115 22;
+    --color-success: 34 197 94;
+    --color-warning: 234 179 8;
+    --color-error: 239 68 68;
+  }
+
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-200;
+  }
+  
+  .btn-primary {
+    @apply btn bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-500/50 focus:outline-none;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-slate-200 text-slate-800 hover:bg-slate-300 focus:ring-2 focus:ring-slate-200/50 focus:outline-none;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden;
+  }
+  
+  .input {
+    @apply rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500/30 focus:ring-opacity-50;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-success {
+    @apply badge bg-green-100 text-green-800;
+  }
+  
+  .badge-pending {
+    @apply badge bg-yellow-100 text-yellow-800;
+  }
+  
+  .badge-failed {
+    @apply badge bg-red-100 text-red-800;
+  }
+}
