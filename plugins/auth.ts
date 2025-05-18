@@ -1,25 +1,25 @@
+// plugins/auth.ts
+
 import { defineNuxtPlugin } from '#app';
 
 export default defineNuxtPlugin(async (nuxtApp) => {
-  // Create reactive state but ensure consistent initial state across server and client
-  // Starting with false prevents hydration mismatches
+  // IMPORTANT: Ensure consistent initial state between server and client
+  // Always start with isAuthenticated = false to prevent hydration mismatches
   const isAuthenticated = useState<boolean>('isAuthenticated', () => false);
   const userRole = useState<string | null>('userRole', () => null);
   
-  // Only initialize from localStorage on client-side AFTER initial hydration
+  // Only initialize from localStorage on client-side AFTER hydration is complete
   if (process.client) {
-    // Use nextTick to ensure this runs after hydration
-    nuxtApp.hook('app:created', () => {
-      nextTick(() => {
-        const token = localStorage.getItem('auth_token');
-        const role = localStorage.getItem('auth_role');
-        
-        if (token && role) {
-          // Update after initial render to prevent hydration mismatch
-          isAuthenticated.value = true;
-          userRole.value = role;
-        }
-      });
+    // Use nuxtApp.hook('app:mounted') to ensure this runs after hydration
+    nuxtApp.hook('app:mounted', () => {
+      const token = localStorage.getItem('auth_token');
+      const role = localStorage.getItem('auth_role');
+      
+      if (token && role) {
+        // Update after hydration is complete to prevent mismatches
+        isAuthenticated.value = true;
+        userRole.value = role;
+      }
     });
   }
   

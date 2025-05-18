@@ -1,4 +1,5 @@
-import { getDeploymentLogs } from '~/utils/fileSystem';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -12,12 +13,21 @@ export default defineEventHandler(async (event) => {
       });
     }
     
-    const logs = await getDeploymentLogs(hostId, eventId);
-    return logs;
+    // Read log file
+    const logFile = path.join(path.resolve('logs'), `${eventId}.log`);
+    
+    try {
+      const logContent = await fs.readFile(logFile, 'utf-8');
+      return logContent.split('\n');
+    } catch (error) {
+      console.error(`Error reading log file ${logFile}:`, error);
+      return ['No logs available for this deployment'];
+    }
   } catch (error) {
     return createError({
       statusCode: 500,
       message: `Failed to get logs: ${error.message}`
     });
   }
-});
+}
+)

@@ -4,10 +4,7 @@
       <h2 class="text-2xl font-bold text-slate-900">Settings</h2>
       <div class="absolute left-1/2 -translate-x-1/2 flex items-center space-x-2">
         <span v-if="showSavedMessage" class="text-sm text-green-600 flex items-center">
-          <svg class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-          </svg>
-          Settings saved
+          Settings saved successfully
         </span>
         <span v-if="hasChanges" class="text-sm text-amber-600">
           You have unsaved changes
@@ -19,77 +16,73 @@
         class="btn-primary"
         :class="{ 'opacity-50': isSaving }"
         :disabled="isSaving">
-        <span v-if="isSaving" class="flex items-center">
-          <svg class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Saving...
-        </span>
+        <span v-if="isSaving">Saving...</span>
         <span v-else>Save Changes</span>
       </button>
     </div>
 
     <div v-if="settings" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Repositories -->
-      <div class="card">
-        <div class="p-4 border-b border-slate-200">
-          <h3 class="text-lg font-medium text-slate-900">Repositories</h3>
-        </div>
-        <div class="p-4">
-          <div v-for="(repo, index) in settings.repositories" :key="repo.id" class="mb-4">
-            <div class="flex items-start space-x-4">
-              <div class="flex-grow space-y-3">
-                <div>
-                  <label class="block text-sm font-medium text-slate-700">Name</label>
-                  <input
-                    v-model="repo.name"
-                    :type="isAdmin ? 'text' : 'text'"
-                    class="input mt-1 block w-full"
-                    :readonly="!isAdmin"
-                    :class="{ 'bg-slate-50 cursor-not-allowed': !isAdmin }"
-                    :disabled="!isAdmin"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-slate-700">URL</label>
-                  <input
-                    v-model="repo.url"
-                    :type="isAdmin ? 'text' : 'text'"
-                    class="input mt-1 block w-full"
-                    :readonly="!isAdmin"
-                    :class="{ 'bg-slate-50 cursor-not-allowed': !isAdmin }"
-                    :disabled="!isAdmin"
-                  />
-                </div>
-              </div>
-              <button
-                v-if="isAdmin"
-                @click="removeRepository(index)"
-                class="text-red-600 hover:text-red-800"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          
-          <button
-            v-if="isAdmin"
-            @click="addRepository"
-            class="btn-secondary mt-4 w-full"
-          >
-            Add Repository
-          </button>
-        </div>
-      </div>
-
-      <!-- Hosts -->
+      <!-- Git Repositories -->
       <div class="card">
         <div class="p-4 border-b border-slate-200">
           <div class="flex justify-between items-center">
-            <h3 class="text-lg font-medium text-slate-900">Hosts</h3>
+            <h3 class="text-lg font-medium text-slate-900">Git Repositories</h3>
+            <button
+              v-if="isAdmin"
+              @click="addRepository"
+              class="btn-secondary text-sm"
+            >
+              Add Repository
+            </button>
+          </div>
+        </div>
+        <div class="p-4">
+          <div v-for="(repo, index) in settings.repositories" :key="repo.id" class="mb-4">
+            <div class="card border-slate-200 p-4">
+              <div class="flex justify-between items-start">
+                <div class="flex-grow space-y-3">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700">Repository Name</label>
+                    <input
+                      v-model="repo.name"
+                      type="text"
+                      class="input mt-1 block w-full"
+                      :readonly="!isAdmin"
+                      :class="{ 'bg-slate-50 cursor-not-allowed': !isAdmin }"
+                      :disabled="!isAdmin"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700">Git URL</label>
+                    <input
+                      v-model="repo.url"
+                      type="text"
+                      class="input mt-1 block w-full"
+                      :readonly="!isAdmin"
+                      :class="{ 'bg-slate-50 cursor-not-allowed': !isAdmin }"
+                      :disabled="!isAdmin"
+                      placeholder="https://github.com/username/repo.git"
+                    />
+                  </div>
+                </div>
+                <button
+                  v-if="isAdmin"
+                  @click="removeRepository(index)"
+                  class="text-red-600 hover:text-red-800 ml-4"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deployment Hosts -->
+      <div class="card">
+        <div class="p-4 border-b border-slate-200">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-medium text-slate-900">Deployment Hosts</h3>
             <button
               v-if="isAdmin"
               @click="addHost"
@@ -102,13 +95,13 @@
         <div class="p-4">
           <div v-for="(host, index) in settings.hosts" :key="host.id" class="mb-4">
             <div class="card border-slate-200 p-4">
-              <div class="flex justify-between items-start mb-4">
-                <div>
-                  <label class="block text-sm font-medium text-slate-700">Name</label>
+              <div class="flex justify-between items-start">
+                <div class="flex-grow">
+                  <label class="block text-sm font-medium text-slate-700">Host Name</label>
                   <input
                     v-model="host.name"
                     type="text"
-                    class="input mt-1 block w-64"
+                    class="input mt-1 block w-full"
                     :readonly="!isAdmin"
                     :class="{ 'bg-slate-50 cursor-not-allowed': !isAdmin }"
                     :disabled="!isAdmin"
@@ -117,111 +110,79 @@
                 <button
                   v-if="isAdmin"
                   @click="removeHost(index)"
-                  class="text-red-600 hover:text-red-800"
+                  class="text-red-600 hover:text-red-800 ml-4"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                  </svg>
+                  Remove
                 </button>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-2">Available Scripts</label>
-                <div class="space-y-2">
-                  <div
-                    v-for="script in availableScripts"
-                    :key="script.id"
-                    class="flex items-center"
-                  >
-                    <input
-                      :id="`script-${host.id}-${script.id}`"
-                      type="checkbox"
-                      :value="script.id"
-                      v-model="host.scripts"
-                      class="h-4 w-4 text-blue-600 border-slate-300 rounded"
-                      :disabled="!isAdmin"
-                    />
-                    <label
-                      :for="`script-${host.id}-${script.id}`"
-                      class="ml-2 block text-sm text-slate-700"
-                    >
-                      {{ script.name }}
-                    </label>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
-      <!-- Scripts -->
-      <div class="space-y-6">
-        <div class="card">
+
+      <!-- User Management -->
+      <div class="card">
         <div class="p-4 border-b border-slate-200">
           <div class="flex justify-between items-center">
-            <h3 class="text-lg font-medium text-slate-900">Deploy Scripts</h3>
+            <h3 class="text-lg font-medium text-slate-900">User Management</h3>
             <button
               v-if="isAdmin"
-              @click="addScript"
+              @click="addUser"
               class="btn-secondary text-sm"
             >
-              Add Script
+              Add User
             </button>
           </div>
         </div>
         <div class="p-4">
-          <div v-for="(script, index) in settings.scripts" :key="script.id" class="mb-4">
+          <div v-for="(user, index) in users" :key="user.id" class="mb-4">
             <div class="card border-slate-200 p-4">
-              <div class="flex justify-between items-start mb-4">
-                <div>
-                  <label class="block text-sm font-medium text-slate-700">Name</label>
-                  <input
-                    v-model="script.name"
-                    type="text"
-                    class="input mt-1 block w-64"
-                    :readonly="!isAdmin"
-                    :class="{ 'bg-slate-50 cursor-not-allowed': !isAdmin }"
-                    :disabled="!isAdmin"
-                  />
+              <div class="flex justify-between items-start">
+                <div class="flex-grow space-y-3">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700">Username</label>
+                    <input
+                      v-model="user.username"
+                      type="text"
+                      class="input mt-1 block w-full"
+                      :readonly="!isAdmin"
+                      :class="{ 'bg-slate-50 cursor-not-allowed': !isAdmin }"
+                      :disabled="!isAdmin"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700">Role</label>
+                    <select
+                      v-model="user.role"
+                      class="input mt-1 block w-full"
+                      :disabled="!isAdmin"
+                      :class="{ 'bg-slate-50 cursor-not-allowed': !isAdmin }"
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="user">User</option>
+                    </select>
+                  </div>
+                  <div v-if="isAdmin">
+                    <label class="block text-sm font-medium text-slate-700">New Password</label>
+                    <input
+                      v-model="user.newPassword"
+                      type="password"
+                      class="input mt-1 block w-full"
+                      placeholder="Leave blank to keep current password"
+                    />
+                  </div>
                 </div>
                 <button
-                  v-if="isAdmin"
-                  @click="removeScript(index)"
-                  class="text-red-600 hover:text-red-800"
+                  v-if="isAdmin && users.length > 1"
+                  @click="removeUser(index)"
+                  class="text-red-600 hover:text-red-800 ml-4"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                  </svg>
-                </button>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700">Path</label>
-                <input
-                  v-model="script.path"
-                  type="text"
-                  class="input mt-1 block w-full"
-                  :readonly="!isAdmin"
-                  :class="{ 'bg-slate-50 cursor-not-allowed': !isAdmin }"
-                  :disabled="!isAdmin"
-                />
-                <button
-                  @click="editScript(script)"
-                  class="btn-secondary text-sm mt-2"
-                >
-                  Edit Script
+                  Remove
                 </button>
               </div>
             </div>
           </div>
         </div>
-        </div>
-        
-        <!-- Script Editor -->
-        <ScriptEditor
-          :script="selectedScript"
-          :is-admin="isAdmin"
-          @script-saved="handleScriptSaved"
-        />
       </div>
     </div>
   </div>
@@ -229,43 +190,54 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { isEqual } from 'lodash-es';
-import type { Settings, Script } from '~/utils/types';
+import { isEqual, cloneDeep } from 'lodash-es';
+
+interface User {
+  id: string;
+  username: string;
+  role: 'admin' | 'user';
+  newPassword?: string;
+}
 
 const { $auth } = useNuxtApp();
 const isAdmin = computed(() => $auth.isAdmin());
 
-const defaultSettings: Settings = {
+const defaultSettings = {
   repositories: [],
-  hosts: [],
-  scripts: []
+  hosts: []
 };
 
-const originalSettings = ref<Settings>(structuredClone(defaultSettings));
-const settings = ref<Settings>(structuredClone(defaultSettings));
+const originalSettings = ref(cloneDeep(defaultSettings));
+const settings = ref(cloneDeep(defaultSettings));
+const users = ref<User[]>([]);
 const isSaving = ref(false);
 const showSavedMessage = ref(false);
-const selectedScript = ref<Script | undefined>();
 
-const availableScripts = computed(() => settings.value.scripts);
-
-// Use lodash isEqual for deep comparison instead of JSON.stringify
 const hasChanges = computed(() => {
-  return !isEqual(settings.value, originalSettings.value);
+  return !isEqual(settings.value, originalSettings.value) || 
+         users.value.some(user => user.newPassword);
 });
 
-// Load settings
+// Load settings and users
 onMounted(async () => {
   if (process.client) {
     try {
-      const response = await fetch('/api/settings');
-      if (response.ok) {
-        const data = await response.json();
+      const [settingsResponse, usersResponse] = await Promise.all([
+        fetch('/api/settings'),
+        fetch('/api/users')
+      ]);
+
+      if (settingsResponse.ok) {
+        const data = await settingsResponse.json();
         settings.value = data;
-        originalSettings.value = structuredClone(data);
+        originalSettings.value = cloneDeep(data);
+      }
+
+      if (usersResponse.ok) {
+        users.value = await usersResponse.json();
       }
     } catch (error) {
-      console.error('Error loading settings:', error);
+      console.error('Error loading data:', error);
     }
   }
 });
@@ -286,7 +258,7 @@ onBeforeRouteLeave((to, from, next) => {
 // Repository functions
 const addRepository = () => {
   settings.value.repositories.push({
-    id: `repo${Date.now()}`,
+    id: `repo-${Date.now()}`,
     name: 'New Repository',
     url: ''
   });
@@ -299,9 +271,8 @@ const removeRepository = (index: number) => {
 // Host functions
 const addHost = () => {
   settings.value.hosts.push({
-    id: `host${Date.now()}`,
-    name: 'New Host',
-    scripts: []
+    id: `host-${Date.now()}`,
+    name: 'New Host'
   });
 };
 
@@ -309,54 +280,60 @@ const removeHost = (index: number) => {
   settings.value.hosts.splice(index, 1);
 };
 
-// Script functions
-const addScript = () => {
-  settings.value.scripts.push({
-    id: `script${Date.now()}`,
-    name: 'New Script',
-    path: './deploy-scripts/new-script.sh'
+// User functions
+const addUser = () => {
+  users.value.push({
+    id: `user-${Date.now()}`,
+    username: '',
+    role: 'user'
   });
 };
 
-const removeScript = (index: number) => {
-  settings.value.scripts.splice(index, 1);
+const removeUser = (index: number) => {
+  users.value.splice(index, 1);
 };
 
-const editScript = (script: Script) => {
-  selectedScript.value = script;
-};
-
-const handleScriptSaved = () => {
-  showSavedMessage.value = true;
-  setTimeout(() => {
-    showSavedMessage.value = false;
-  }, 3000);
-};
-
-// Save settings
+// Save all settings
 const saveSettings = async () => {
   if (!isAdmin.value) return;
   
   isSaving.value = true;
   try {
-    const response = await fetch('/api/settings', {
+    const token = localStorage.getItem('auth_token');
+    if (!token) throw new Error('No auth token');
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+
+    // Save settings
+    await fetch('/api/settings', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-      },
+      headers,
       body: JSON.stringify(settings.value)
     });
-    
-    if (response.ok) {
-      originalSettings.value = structuredClone(settings.value);
-      showSavedMessage.value = true;
-      setTimeout(() => {
-        showSavedMessage.value = false;
-      }, 3000);
-    }
+
+    // Save users
+    await fetch('/api/users', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(users.value)
+    });
+
+    originalSettings.value = cloneDeep(settings.value);
+    showSavedMessage.value = true;
+    setTimeout(() => {
+      showSavedMessage.value = false;
+    }, 3000);
+
+    // Clear any new passwords
+    users.value.forEach(user => {
+      delete user.newPassword;
+    });
   } catch (error) {
-    console.error('Error saving settings:', error);
+    console.error('Error saving:', error);
+    alert('Failed to save changes');
   } finally {
     isSaving.value = false;
   }

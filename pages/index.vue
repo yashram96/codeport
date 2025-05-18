@@ -2,37 +2,39 @@
   <div>
     <h2 class="text-2xl font-bold text-slate-900 mb-6">Deployment Control Center</h2>
     
-    <div v-if="isLoading" class="flex justify-center py-12">
-      <div class="flex items-center space-x-2">
-        <div class="h-3 w-3 bg-blue-600 rounded-full animate-bounce"></div>
-        <div class="h-3 w-3 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-        <div class="h-3 w-3 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
-      </div>
-    </div>
-    
-    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Deployment Form -->
-      <div>
-        <DeploymentForm 
-          :repositories="settings.repositories" 
-          :hosts="settings.hosts"
-          @deployment-started="handleDeploymentStarted"
-          @host-selected="selectedHostId = $event"
-        />
+    <client-only>
+      <div v-if="isLoading" class="flex justify-center py-12">
+        <div class="flex items-center space-x-2">
+          <div class="h-3 w-3 bg-blue-600 rounded-full animate-bounce"></div>
+          <div class="h-3 w-3 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+          <div class="h-3 w-3 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+        </div>
       </div>
       
-      <!-- Deployment History -->
-      <div>
-        <DeploymentHistory 
-          :hostId="selectedHostId" 
-          :repositories="settings.repositories"
-          @event-selected="selectedEvent = $event"
-        />
-      </div>
-      
-      <!-- Log Viewer -->
-      <div>
-        <client-only>
+      <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Deployment Form -->
+        <div>
+          <DeploymentForm 
+            :repositories="settings.repositories" 
+            :hosts="settings.hosts"
+            :scripts="settings.scripts"
+            @deployment-started="handleDeploymentStarted"
+            @host-selected="selectedHostId = $event"
+          />
+        </div>
+        
+        <!-- Deployment History -->
+        <div>
+          <DeploymentHistory 
+            :hostId="selectedHostId"
+            :limit="4"
+            :repositories="settings.repositories"
+            @event-selected="selectedEvent = $event"
+          />
+        </div>
+        
+        <!-- Log Viewer -->
+        <div>
           <LogViewer 
             v-if="selectedEvent" 
             :hostId="selectedHostId" 
@@ -41,9 +43,9 @@
           <div v-else class="card h-full flex items-center justify-center text-slate-500">
             Select a deployment to view logs
           </div>
-        </client-only>
+        </div>
       </div>
-    </div>
+    </client-only>
   </div>
 </template>
 
@@ -58,13 +60,17 @@ const isLoading = ref(true);
 const selectedHostId = ref('');
 const selectedEvent = ref(null);
 
+// Compute latest 4 deployments for the selected host
+const latestDeployments = computed(() => {
+  if (!selectedHostId.value) return [];
+  return history.value.slice(0, 4);
+});
+
 // Access auth state
 const isAuthenticated = useState('isAuthenticated');
 
 // Fetch settings on client-side only
 const fetchSettings = async () => {
-  if (process.server) return;
-  
   try {
     const token = localStorage.getItem('auth_token');
     if (!token) return;
@@ -99,9 +105,6 @@ onMounted(() => {
     nextTick(() => {
       fetchSettings();
     });
-  } else {
-    // On server side, just mark as not loading to prevent hydration mismatch
-    isLoading.value = false;
   }
 });
 

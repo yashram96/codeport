@@ -2,7 +2,7 @@
   "repositories": [
     {
       "id": "repo1747364060274",
-      "name": "New Repository",
+      "name": "sample",
       "url": "vjneven"
     },
     {
@@ -14,7 +14,7 @@
   "hosts": [
     {
       "id": "host1747364071346",
-      "name": "New Host",
+      "name": "r1",
       "scripts": [
         "script1747364077721",
         "script1747364082042"
@@ -22,7 +22,7 @@
     },
     {
       "id": "host1747364074444",
-      "name": "New Host",
+      "name": "r2",
       "scripts": []
     }
   ],

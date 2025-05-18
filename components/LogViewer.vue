@@ -22,7 +22,10 @@
       </div>
     </div>
     <div class="flex-grow overflow-auto bg-slate-800 p-4 font-mono text-sm text-slate-100">
-      <div v-if="logs.length === 0 && !isLoading" class="flex items-center justify-center h-full text-slate-400">
+      <div v-if="error" class="flex items-center justify-center h-full text-red-400">
+        {{ error }}
+      </div>
+      <div v-else-if="logs.length === 0 && !isLoading" class="flex items-center justify-center h-full text-slate-400">
         <span>No logs available</span>
       </div>
       <div v-else>
@@ -44,20 +47,25 @@ const props = defineProps<{
 
 const logs = ref<string[]>([]);
 const isLoading = ref(false);
+const error = ref<string | null>(null);
 
 const fetchLogs = async () => {
   if (!props.hostId || !props.eventId || !process.client) return;
   
+  error.value = null;
   isLoading.value = true;
   try {
     const response = await fetch(`/api/logs/${props.hostId}/${props.eventId}`);
     if (response.ok) {
       logs.value = await response.json();
     } else {
-      console.error('Failed to fetch logs');
+      error.value = `Failed to fetch logs: ${response.statusText}`;
+      console.error('Failed to fetch logs:', response.statusText);
     }
-  } catch (error) {
-    console.error('Error fetching logs:', error);
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    error.value = `Error loading logs: ${errorMessage}`;
+    console.error('Error fetching logs:', err);
   } finally {
     isLoading.value = false;
   }

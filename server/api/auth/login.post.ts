@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import bcrypt from 'bcryptjs';
+import { getAuthConfig } from '../../utils/auth';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -13,9 +14,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Read auth config
-    const authConfigPath = path.resolve('config/auth.json');
-    const authConfig = await fs.readJson(authConfigPath);
+    const authConfig = await getAuthConfig();
 
     // Check admin credentials
     if (username === authConfig.write.admin.username) {

@@ -1,6 +1,25 @@
-import bcrypt from 'bcryptjs';
+import fs from 'fs-extra';
+import path from 'path';
 
-export const generateHash = async (password: string): Promise<string> => {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
+interface AuthConfig {
+  write: {
+    admin: {
+      username: string;
+      hashedPassword: string;
+    };
+  };
+  readonly: {
+    username: string;
+    hashedPassword: string;
+  };
+}
+
+export const getAuthConfig = async (): Promise<AuthConfig> => {
+  try {
+    const authConfigPath = path.resolve('config/auth.json');
+    return await fs.readJson(authConfigPath);
+  } catch (error) {
+    console.error('Error reading auth config:', error);
+    throw error;
+  }
 };

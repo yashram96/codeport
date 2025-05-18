@@ -1,7 +1,9 @@
 <template>
   <div class="card h-full flex flex-col">
     <div class="p-4 border-b border-slate-200">
-      <h3 class="text-lg font-medium text-slate-900">Deployment History</h3>
+      <div class="flex justify-between items-center space-x-4">
+        <h3 class="text-lg font-medium text-slate-900">Deployment History</h3>
+      </div>
     </div>
     <div class="flex-grow overflow-auto p-4">
       <div v-if="isLoading" class="flex justify-center p-4">
@@ -10,6 +12,9 @@
           <div class="h-2 w-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
           <div class="h-2 w-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
         </div>
+      </div>
+      <div v-else-if="error" class="text-center py-8 text-red-500">
+        {{ error }}
       </div>
       <div v-else-if="history.length === 0" class="text-center py-8 text-slate-500">
         No deployment history
@@ -54,9 +59,13 @@
 import { ref, onMounted, watch, onUnmounted } from 'vue';
 import type { DeploymentEvent, Repository } from '~/utils/types';
 
+const { $auth } = useNuxtApp();
+const isAdmin = computed(() => $auth.isAdmin());
+
 const props = defineProps<{
   hostId: string;
   repositories: Repository[];
+  limit?: number;
 }>();
 
 const emit = defineEmits(['event-selected']);
@@ -64,29 +73,40 @@ const emit = defineEmits(['event-selected']);
 const history = ref<DeploymentEvent[]>([]);
 const isLoading = ref(false);
 const selectedEvent = ref<DeploymentEvent | null>(null);
+const error = ref<string | null>(null);
 
 const fetchHistory = async () => {
   if (!props.hostId || !process.client) return;
   
+  error.value = null;
   isLoading.value = true;
   try {
     const response = await fetch(`/api/history/${props.hostId}`);
     if (response.ok) {
       history.value = await response.json();
       
+      // Apply limit if specified
+      if (props.limit) {
+        history.value = history.value.slice(0, props.limit);
+      }
+      
       // Select the first event if none is selected
       if (history.value.length > 0 && !selectedEvent.value) {
         selectEvent(history.value[0]);
       }
     } else {
-      console.error('Failed to fetch history');
+      error.value = `Failed to fetch history: ${response.statusText}`;
+      console.error('Failed to fetch history:', response.statusText);
     }
-  } catch (error) {
-    console.error('Error fetching history:', error);
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    error.value = `Error loading history: ${errorMessage}`;
+    console.error('Error fetching history:', err);
   } finally {
     isLoading.value = false;
   }
 };
+
 
 const selectEvent = (event: DeploymentEvent) => {
   selectedEvent.value = event;
